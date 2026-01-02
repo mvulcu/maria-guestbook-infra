@@ -24,7 +24,7 @@ backend:
   
   image:
     repository: ghcr.io/mvulcu/guestbook-backend
-    tag: "latest"  # backend-tag (auto-updated by CI)
+    tag: "a4c4beb"  # backend-tag (auto-updated by CI)
     pullPolicy: Always
   
   service:
@@ -68,7 +68,7 @@ frontend:
   
   image:
     repository: ghcr.io/mvulcu/guestbook-frontend
-    tag: "latest"  # frontend-tag (auto-updated by CI)
+    tag: "a4c4beb"  # frontend-tag (auto-updated by CI)
     pullPolicy: Always
   
   service:
