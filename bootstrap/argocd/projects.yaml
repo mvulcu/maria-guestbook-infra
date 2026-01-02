@@ -17,26 +17,26 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   description: "Maria Guestbook Application Project"
-  
+
   # Source repositories allowed
   sourceRepos:
     - https://github.com/mvulcu/maria-guestbook-infra
     - https://github.com/mvulcu/maria-guestbook-app
-  
+
   # Destination clusters and namespaces allowed
   destinations:
     - namespace: maria-guestbook
       server: https://kubernetes.default.svc
     - namespace: argocd
       server: https://kubernetes.default.svc
-  
+
   # Cluster resources that can be managed
   clusterResourceWhitelist:
     - group: ''
       kind: Namespace
     - group: networking.k8s.io
       kind: Ingress
-  
+
   # Namespace-scoped resources that can be managed
   namespaceResourceWhitelist:
     - group: ''
@@ -47,7 +47,9 @@ spec:
       kind: '*'
     - group: autoscaling
       kind: '*'
-  
+    - group: policy
+      kind: '*'
+
   # Roles for this project
   roles:
     - name: developer
@@ -55,7 +57,7 @@ spec:
       policies:
         - p, proj:maria-guestbook:developer, applications, get, maria-guestbook/*, allow
         - p, proj:maria-guestbook:developer, applications, sync, maria-guestbook/*, allow
-    
+
     - name: admin
       description: "Admin access to maria-guestbook"
       policies:
