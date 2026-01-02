@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 global:
   # Image pull secrets for private registries
-  # imagePullSecrets:
-  #   - name: ghcr-secret
+  imagePullSecrets: []
 
 # -----------------------------------------------------------------------------
 # Backend (Go API Server)
@@ -58,6 +57,10 @@ backend:
   env:
     redisHost: maria-redis
     redisPort: "6379"
+    dbHost: maria-postgres
+    dbPort: "5432"
+    dbUser: guestbook
+    dbName: guestbook
 
 # -----------------------------------------------------------------------------
 # Frontend (Nginx)
@@ -90,6 +93,33 @@ frontend:
       port: 8080
     initialDelaySeconds: 3
     periodSeconds: 5
+
+# -----------------------------------------------------------------------------
+# PostgreSQL (Database)
+# -----------------------------------------------------------------------------
+postgresql:
+  enabled: true
+
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  auth:
+    enabled: true
+    username: guestbook
+    database: guestbook
+    password: "password" # Default password for demo
+    existingSecret: maria-postgres-secret
+    existingSecretPasswordKey: password
 
 # -----------------------------------------------------------------------------
 # Redis (Cache)

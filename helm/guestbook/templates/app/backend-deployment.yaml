@@ -41,6 +41,19 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.redis.auth.existingSecret }}
                   key: {{ .Values.redis.auth.existingSecretPasswordKey }}
+            - name: DB_HOST
+              value: {{ .Values.backend.env.dbHost | quote }}
+            - name: DB_PORT
+              value: {{ .Values.backend.env.dbPort | quote }}
+            - name: DB_USER
+              value: {{ .Values.backend.env.dbUser | quote }}
+            - name: DB_NAME
+              value: {{ .Values.backend.env.dbName | quote }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.auth.existingSecret }}
+                  key: {{ .Values.postgresql.auth.existingSecretPasswordKey }}
             - name: PORT
               value: "8080"
           livenessProbe:

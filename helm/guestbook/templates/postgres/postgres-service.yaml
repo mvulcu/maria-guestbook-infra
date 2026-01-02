@@ -1,0 +1,18 @@
+{{- if .Values.postgresql.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: maria-postgres
+  labels:
+    app.kubernetes.io/name: maria-postgres
+    app.kubernetes.io/part-of: maria-guestbook
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: postgres
+      protocol: TCP
+      name: postgres
+  selector:
+    app.kubernetes.io/name: maria-postgres
+{{- end }}
