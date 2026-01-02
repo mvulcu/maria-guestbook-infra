@@ -12,8 +12,8 @@
 # -----------------------------------------------------------------------------
 global:
   # Image pull secrets for private registries
-  imagePullSecrets:
-    - name: ghcr-secret
+  # imagePullSecrets:
+  #   - name: ghcr-secret
 
 # -----------------------------------------------------------------------------
 # Backend (Go API Server)
