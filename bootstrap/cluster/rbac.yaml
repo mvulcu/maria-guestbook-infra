@@ -1,0 +1,139 @@
+# =============================================================================
+# RBAC - Role-Based Access Control
+# =============================================================================
+# Defines access policies for the maria-guestbook namespace
+# =============================================================================
+
+---
+# ServiceAccount for the application
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maria-guestbook-sa
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+
+---
+# Role with minimal required permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: maria-guestbook-role
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+rules:
+  # Allow reading configmaps and secrets
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  # Allow reading pods (for health checks)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # Allow reading services
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch"]
+
+---
+# Bind role to service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: maria-guestbook-rolebinding
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+subjects:
+  - kind: ServiceAccount
+    name: maria-guestbook-sa
+    namespace: maria-guestbook
+roleRef:
+  kind: Role
+  name: maria-guestbook-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Network Policy - Restrict traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+
+---
+# Allow ingress to frontend
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-frontend
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: maria-frontend
+  ingress:
+    - from: []  # Allow from anywhere (ingress controller)
+      ports:
+        - protocol: TCP
+          port: 8080
+  policyTypes:
+    - Ingress
+
+---
+# Allow frontend to backend
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-to-backend
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: maria-backend
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: maria-frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+  policyTypes:
+    - Ingress
+
+---
+# Allow backend to redis
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-backend-to-redis
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: maria-redis
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: maria-backend
+      ports:
+        - protocol: TCP
+          port: 6379
+  policyTypes:
+    - Ingress

@@ -1,0 +1,21 @@
+# =============================================================================
+# Namespaces - Infrastructure as Code
+# =============================================================================
+# All namespaces are defined here for consistency and version control
+# =============================================================================
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+    app.kubernetes.io/managed-by: argocd
+    environment: production
+  annotations:
+    description: "Maria Guestbook application namespace"
+
+---
+# Note: argocd namespace is created separately in bootstrap/argocd/namespace.yaml
+# to ensure proper ordering during installation

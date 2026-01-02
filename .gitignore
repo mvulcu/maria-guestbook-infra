@@ -1,0 +1,33 @@
+# Helm
+*.tgz
+charts/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets (NEVER commit real secrets!)
+*-secrets.yaml
+!*-secrets.yaml.example
+*.key
+*.pem
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# Debug output
+debug-*.yaml
+logs.txt
+
+
+SETUP.md
+TESTING.md
+*.md

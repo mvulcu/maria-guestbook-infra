@@ -1,0 +1,76 @@
+# =============================================================================
+# Resource Quotas - Infrastructure as Code
+# =============================================================================
+# Limits resource usage in the maria-guestbook namespace
+# Prevents runaway resource consumption
+# =============================================================================
+
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: maria-guestbook-quota
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+spec:
+  hard:
+    # Pod limits
+    pods: "20"
+    
+    # CPU limits
+    requests.cpu: "2"
+    limits.cpu: "4"
+    
+    # Memory limits
+    requests.memory: "2Gi"
+    limits.memory: "4Gi"
+    
+    # Storage limits
+    requests.storage: "10Gi"
+    persistentvolumeclaims: "5"
+    
+    # Other limits
+    configmaps: "20"
+    secrets: "20"
+    services: "10"
+    replicationcontrollers: "10"
+
+---
+# Limit ranges for individual pods/containers
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: maria-guestbook-limits
+  namespace: maria-guestbook
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+spec:
+  limits:
+    # Default limits for containers
+    - type: Container
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      max:
+        cpu: "2"
+        memory: "2Gi"
+      min:
+        cpu: "50m"
+        memory: "64Mi"
+    
+    # Limits for pods
+    - type: Pod
+      max:
+        cpu: "4"
+        memory: "4Gi"
+    
+    # Limits for PVCs
+    - type: PersistentVolumeClaim
+      max:
+        storage: "5Gi"
+      min:
+        storage: "100Mi"

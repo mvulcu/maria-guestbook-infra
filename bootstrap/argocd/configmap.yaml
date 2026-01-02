@@ -1,0 +1,88 @@
+# =============================================================================
+# ArgoCD Configuration - Infrastructure as Code
+# =============================================================================
+# Custom configuration for ArgoCD
+# Applied on top of the default ArgoCD installation
+# =============================================================================
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # Repository configuration
+  repositories: |
+    - url: https://github.com/mvulcu/maria-guestbook-infra
+      name: maria-guestbook-infra
+      type: git
+    - url: https://github.com/mvulcu/maria-guestbook-app
+      name: maria-guestbook-app
+      type: git
+
+  # Resource tracking method
+  application.resourceTrackingMethod: annotation
+
+  # Status badge enabled
+  statusbadge.enabled: "true"
+
+  # Timeout settings
+  timeout.reconciliation: 180s
+
+  # URL for ArgoCD (used in notifications, badges, etc.)
+  url: https://argocd.cicd.cachefly.site
+
+---
+# ArgoCD RBAC Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # Default policy: readonly for all, admin for admin user
+  policy.default: role:readonly
+  policy.csv: |
+    # Admin has full access
+    p, role:admin, applications, *, */*, allow
+    p, role:admin, clusters, *, *, allow
+    p, role:admin, repositories, *, *, allow
+    p, role:admin, projects, *, *, allow
+    
+    # Developer role - can sync and view applications
+    p, role:developer, applications, get, */*, allow
+    p, role:developer, applications, sync, */*, allow
+    p, role:developer, applications, action, */*, allow
+    p, role:developer, logs, get, */*, allow
+    
+    # Assign admin role to admin user
+    g, admin, role:admin
+
+---
+# ArgoCD Command Parameters
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cmd-params-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # Server configuration
+  server.insecure: "true"  # TLS handled by ingress
+  
+  # Repo server configuration
+  reposerver.parallelism.limit: "5"
+  
+  # Controller configuration
+  controller.status.processors: "20"
+  controller.operation.processors: "10"
+  controller.self.heal.timeout.seconds: "5"

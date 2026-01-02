@@ -1,0 +1,72 @@
+# =============================================================================
+# Maria Guestbook Application
+# =============================================================================
+# ArgoCD Application for the Guestbook Helm chart
+# =============================================================================
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: maria-guestbook
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: maria-guestbook
+    app.kubernetes.io/part-of: maria-guestbook
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    # Notifications (optional)
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: deployments
+spec:
+  project: maria-guestbook
+  
+  source:
+    repoURL: https://github.com/mvulcu/maria-guestbook-infra
+    targetRevision: main
+    path: helm/guestbook
+    
+    # Helm configuration
+    helm:
+      valueFiles:
+        - values.yaml
+      # Can override values here if needed
+      # parameters:
+      #   - name: backend.replicaCount
+      #     value: "3"
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: maria-guestbook
+  
+  # Sync policy - fully automated
+  syncPolicy:
+    automated:
+      prune: true           # Delete resources when removed from Git
+      selfHeal: true        # Revert manual changes
+      allowEmpty: false     # Don't sync if source is empty
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  # Health checks
+  ignoreDifferences:
+    # Ignore auto-generated fields
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas  # If using HPA
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+      jsonPointers:
+        - /status
+  
+  # Revision history limit
+  revisionHistoryLimit: 10

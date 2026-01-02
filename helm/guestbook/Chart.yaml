@@ -1,0 +1,23 @@
+apiVersion: v2
+name: maria-guestbook
+description: |
+  Guestbook application with GitOps deployment.
+  A 3-tier application with frontend (Nginx), backend (Go), and Redis cache.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+maintainers:
+  - name: Maria Vulcu
+    url: https://github.com/mvulcu
+
+keywords:
+  - guestbook
+  - gitops
+  - argocd
+  - kubernetes
+
+home: https://github.com/mvulcu/maria-guestbook-infra
+sources:
+  - https://github.com/mvulcu/maria-guestbook-app
+  - https://github.com/mvulcu/maria-guestbook-infra

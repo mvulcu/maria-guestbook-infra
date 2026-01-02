@@ -1,0 +1,185 @@
+# =============================================================================
+# Maria Guestbook - Helm Values
+# =============================================================================
+# This is the main configuration file for the Guestbook application.
+# Changes here are automatically deployed by ArgoCD.
+#
+# Teacher: To test GitOps, modify replicaCount values and commit.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Global Settings
+# -----------------------------------------------------------------------------
+global:
+  # Image pull secrets for private registries
+  imagePullSecrets:
+    - name: ghcr-secret
+
+# -----------------------------------------------------------------------------
+# Backend (Go API Server)
+# -----------------------------------------------------------------------------
+backend:
+  # Number of replicas - CHANGE THIS TO TEST SCALING
+  replicaCount: 2
+  
+  image:
+    repository: ghcr.io/mvulcu/guestbook-backend
+    tag: "latest"  # backend-tag (auto-updated by CI)
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 8080
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 15
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 3
+    periodSeconds: 5
+
+  # Environment variables
+  env:
+    redisHost: maria-redis
+    redisPort: "6379"
+
+# -----------------------------------------------------------------------------
+# Frontend (Nginx)
+# -----------------------------------------------------------------------------
+frontend:
+  # Number of replicas - CHANGE THIS TO TEST SCALING
+  replicaCount: 2
+  
+  image:
+    repository: ghcr.io/mvulcu/guestbook-frontend
+    tag: "latest"  # frontend-tag (auto-updated by CI)
+    pullPolicy: Always
+  
+  service:
+    type: ClusterIP
+    port: 8080
+  
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  
+  # Health check
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 8080
+    initialDelaySeconds: 3
+    periodSeconds: 5
+
+# -----------------------------------------------------------------------------
+# Redis (Cache)
+# -----------------------------------------------------------------------------
+redis:
+  enabled: true
+  
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+  
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+  
+  # Redis authentication
+  auth:
+    enabled: true
+    # Password is stored in secret, not here
+    existingSecret: maria-redis-secret
+    existingSecretPasswordKey: password
+
+# -----------------------------------------------------------------------------
+# Ingress
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+  
+  host: maria-guestbook.cicd.cachefly.site
+  
+  tls:
+    enabled: true
+    secretName: maria-guestbook-tls
+
+# -----------------------------------------------------------------------------
+# Autoscaling (HPA)
+# -----------------------------------------------------------------------------
+autoscaling:
+  enabled: false  # Disabled for predictable testing
+  # enabled: true
+  # minReplicas: 2
+  # maxReplicas: 10
+  # targetCPUUtilizationPercentage: 70
+  # targetMemoryUtilizationPercentage: 80
+
+# -----------------------------------------------------------------------------
+# Pod Disruption Budget
+# -----------------------------------------------------------------------------
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# -----------------------------------------------------------------------------
+# Service Account
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: maria-guestbook-sa
+  annotations: {}
+
+# -----------------------------------------------------------------------------
+# Security Context
+# -----------------------------------------------------------------------------
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# -----------------------------------------------------------------------------
+# Node Affinity / Tolerations (optional)
+# -----------------------------------------------------------------------------
+nodeSelector: {}
+tolerations: []
+affinity: {}

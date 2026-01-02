@@ -1,0 +1,81 @@
+# =============================================================================
+# ArgoCD Projects - Infrastructure as Code
+# =============================================================================
+# Defines ArgoCD projects for organizing applications
+# =============================================================================
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: maria-guestbook
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: maria-guestbook
+  # Finalizer ensures proper cleanup
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: "Maria Guestbook Application Project"
+  
+  # Source repositories allowed
+  sourceRepos:
+    - https://github.com/mvulcu/maria-guestbook-infra
+    - https://github.com/mvulcu/maria-guestbook-app
+  
+  # Destination clusters and namespaces allowed
+  destinations:
+    - namespace: maria-guestbook
+      server: https://kubernetes.default.svc
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  
+  # Cluster resources that can be managed
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: networking.k8s.io
+      kind: Ingress
+  
+  # Namespace-scoped resources that can be managed
+  namespaceResourceWhitelist:
+    - group: ''
+      kind: '*'
+    - group: apps
+      kind: '*'
+    - group: networking.k8s.io
+      kind: '*'
+    - group: autoscaling
+      kind: '*'
+  
+  # Roles for this project
+  roles:
+    - name: developer
+      description: "Developer access to maria-guestbook"
+      policies:
+        - p, proj:maria-guestbook:developer, applications, get, maria-guestbook/*, allow
+        - p, proj:maria-guestbook:developer, applications, sync, maria-guestbook/*, allow
+    
+    - name: admin
+      description: "Admin access to maria-guestbook"
+      policies:
+        - p, proj:maria-guestbook:admin, applications, *, maria-guestbook/*, allow
+        - p, proj:maria-guestbook:admin, repositories, *, maria-guestbook/*, allow
+
+---
+# Default project configuration (optional, for reference)
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+  namespace: argocd
+spec:
+  description: "Default project"
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
