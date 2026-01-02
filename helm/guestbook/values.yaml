@@ -73,7 +73,7 @@ backend:
 # -----------------------------------------------------------------------------
 frontend:
   # Number of replicas - CHANGE THIS TO TEST SCALING
-  replicaCount: 2
+  replicaCount: 3
 
   image:
     repository: ghcr.io/mvulcu/maria-guestbook-frontend
