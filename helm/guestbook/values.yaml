@@ -21,16 +21,16 @@ global:
 backend:
   # Number of replicas - CHANGE THIS TO TEST SCALING
   replicaCount: 2
-  
+
   image:
-    repository: ghcr.io/mvulcu/guestbook-backend
+    repository: ghcr.io/mvulcu/maria-guestbook-backend
     tag: "a4c4beb"  # backend-tag (auto-updated by CI)
     pullPolicy: Always
-  
+
   service:
     type: ClusterIP
     port: 8080
-  
+
   resources:
     requests:
       cpu: 100m
@@ -38,7 +38,7 @@ backend:
     limits:
       cpu: 500m
       memory: 512Mi
-  
+
   # Health checks
   livenessProbe:
     httpGet:
@@ -46,7 +46,7 @@ backend:
       port: 8080
     initialDelaySeconds: 10
     periodSeconds: 15
-  
+
   readinessProbe:
     httpGet:
       path: /health
@@ -65,16 +65,16 @@ backend:
 frontend:
   # Number of replicas - CHANGE THIS TO TEST SCALING
   replicaCount: 2
-  
+
   image:
-    repository: ghcr.io/mvulcu/guestbook-frontend
+    repository: ghcr.io/mvulcu/maria-guestbook-frontend
     tag: "a4c4beb"  # frontend-tag (auto-updated by CI)
     pullPolicy: Always
-  
+
   service:
     type: ClusterIP
     port: 8080
-  
+
   resources:
     requests:
       cpu: 50m
@@ -82,7 +82,7 @@ frontend:
     limits:
       cpu: 200m
       memory: 256Mi
-  
+
   # Health check
   readinessProbe:
     httpGet:
@@ -96,12 +96,12 @@ frontend:
 # -----------------------------------------------------------------------------
 redis:
   enabled: true
-  
+
   image:
     repository: redis
     tag: "7-alpine"
     pullPolicy: IfNotPresent
-  
+
   resources:
     requests:
       cpu: 50m
@@ -109,7 +109,7 @@ redis:
     limits:
       cpu: 200m
       memory: 128Mi
-  
+
   # Redis authentication
   auth:
     enabled: true
@@ -123,14 +123,14 @@ redis:
 ingress:
   enabled: true
   className: nginx
-  
+
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-  
+
   host: maria-guestbook.cicd.cachefly.site
-  
+
   tls:
     enabled: true
     secretName: maria-guestbook-tls
