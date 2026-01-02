@@ -26,6 +26,7 @@ Thumbs.db
 # Debug output
 debug-*.yaml
 logs.txt
+*.txt
 
 
 SETUP.md
