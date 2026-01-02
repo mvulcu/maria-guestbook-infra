@@ -29,7 +29,7 @@ backend:
 
   image:
     repository: ghcr.io/mvulcu/maria-guestbook-backend
-    tag: "4b0f301"  # backend-tag (auto-updated by CI)
+    tag: "25e672b"  # backend-tag (auto-updated by CI)
     pullPolicy: Always
 
   service:
@@ -77,7 +77,7 @@ frontend:
 
   image:
     repository: ghcr.io/mvulcu/maria-guestbook-frontend
-    tag: "4b0f301"  # frontend-tag (auto-updated by CI)
+    tag: "25e672b"  # frontend-tag (auto-updated by CI)
     pullPolicy: Always
 
   service:
