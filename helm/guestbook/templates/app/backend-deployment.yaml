@@ -1,11 +1,17 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: maria-backend
   labels:
     {{- include "guestbook.backend.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.backend.replicaCount }}
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause: {}
+      - setWeight: 100
   selector:
     matchLabels:
       {{- include "guestbook.backend.selectorLabels" . | nindent 6 }}
