@@ -49,6 +49,8 @@ spec:
       kind: '*'
     - group: policy
       kind: '*'
+    - group: argoproj.io
+      kind: '*'
 
   # Roles for this project
   roles:
