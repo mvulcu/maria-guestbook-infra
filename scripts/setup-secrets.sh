@@ -42,11 +42,11 @@ else
         REDIS_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 32)
         echo "  Generated random password"
     fi
-    
+
     kubectl create secret generic maria-redis-secret \
         --from-literal=password="$REDIS_PASSWORD" \
         -n "$NAMESPACE"
-    
+
     echo -e "${GREEN}✓ Redis secret created${NC}"
     echo -e "  Password: ${YELLOW}$REDIS_PASSWORD${NC}"
     echo -e "  ${RED}Save this password! It won't be shown again.${NC}"
@@ -65,14 +65,39 @@ else
     read -p "  GitHub Username: " GITHUB_USER
     read -sp "  GitHub Personal Access Token (with read:packages): " GITHUB_TOKEN
     echo ""
-    
+
     kubectl create secret docker-registry ghcr-secret \
         --docker-server=ghcr.io \
         --docker-username="$GITHUB_USER" \
         --docker-password="$GITHUB_TOKEN" \
         -n "$NAMESPACE"
-    
+
     echo -e "${GREEN}✓ GHCR secret created${NC}"
+    echo -e "${GREEN}✓ GHCR secret created${NC}"
+fi
+echo ""
+
+# -----------------------------------------------------------------------------
+# Postgres Secret
+# -----------------------------------------------------------------------------
+echo -e "${YELLOW}[3/3] Creating Postgres secret...${NC}"
+
+if kubectl get secret maria-postgres-secret -n "$NAMESPACE" &> /dev/null; then
+    echo -e "${GREEN}✓ Postgres secret already exists${NC}"
+else
+    # Generate random password or use provided
+    if [ -z "$DB_PASSWORD" ]; then
+        DB_PASSWORD=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 32)
+        echo "  Generated random password"
+    fi
+
+    kubectl create secret generic maria-postgres-secret \
+        --from-literal=password="$DB_PASSWORD" \
+        -n "$NAMESPACE"
+
+    echo -e "${GREEN}✓ Postgres secret created${NC}"
+    echo -e "  Password: ${YELLOW}$DB_PASSWORD${NC}"
+    echo -e "  ${RED}Save this password! It won't be shown again.${NC}"
 fi
 echo ""
 
