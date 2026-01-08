@@ -15,16 +15,18 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    # Notifications (optional)
-    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: deployments
+    # Notifications
+    notifications.argoproj.io/subscribe.on-sync-succeeded.discord: ""
+    notifications.argoproj.io/subscribe.on-sync-failed.discord: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.discord: ""
 spec:
   project: maria-guestbook
-  
+
   source:
     repoURL: https://github.com/mvulcu/maria-guestbook-infra
     targetRevision: main
     path: helm/guestbook
-    
+
     # Helm configuration
     helm:
       valueFiles:
@@ -33,11 +35,11 @@ spec:
       # parameters:
       #   - name: backend.replicaCount
       #     value: "3"
-  
+
   destination:
     server: https://kubernetes.default.svc
     namespace: maria-guestbook
-  
+
   # Sync policy - fully automated
   syncPolicy:
     automated:
@@ -55,7 +57,7 @@ spec:
         duration: 5s
         factor: 2
         maxDuration: 3m
-  
+
   # Health checks
   ignoreDifferences:
     # Ignore auto-generated fields
@@ -67,6 +69,6 @@ spec:
       kind: HorizontalPodAutoscaler
       jsonPointers:
         - /status
-  
+
   # Revision history limit
   revisionHistoryLimit: 10
