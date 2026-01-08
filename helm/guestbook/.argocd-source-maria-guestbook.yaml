@@ -4,11 +4,14 @@ helm:
     value: ghcr.io/mvulcu/maria-guestbook-backend
     forcestring: true
   - name: backend.image.tag
-    value: latest
+    value: a5f2dbf
     forcestring: true
   - name: frontend.image.repository
     value: ghcr.io/mvulcu/maria-guestbook-frontend
     forcestring: true
   - name: frontend.image.tag
-    value: latest
+    value: a5f2dbf
     forcestring: true
+  - name: backend.replicaCount
+    value: "1"
+    forcestring: false
