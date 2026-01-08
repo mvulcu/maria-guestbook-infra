@@ -172,6 +172,17 @@ postgresql:
     existingSecret: maria-postgres-secret
     existingSecretPasswordKey: password
 
+  # Backup settings
+  backup:
+    enabled: true
+    # Cron schedule: Daily at 2:00 AM
+    schedule: "0 2 * * *"
+    # Keep last 7 backups
+    retention: 7
+    # PersistentVolume for backup storage
+    persistentVolume:
+      enabled: false  # Set to true for production
+
 # -----------------------------------------------------------------------------
 # Redis (Cache)
 # -----------------------------------------------------------------------------

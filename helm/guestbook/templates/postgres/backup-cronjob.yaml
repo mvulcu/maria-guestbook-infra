@@ -1,0 +1,94 @@
+# =============================================================================
+# PostgreSQL Backup CronJob
+# =============================================================================
+# Automated backup using pg_dump
+# Schedule: Daily at 2:00 AM
+# Retention: Last 7 backups kept
+# =============================================================================
+{{- if and .Values.postgresql.enabled .Values.postgresql.backup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  labels:
+    app.kubernetes.io/name: postgres-backup
+    app.kubernetes.io/part-of: maria-guestbook
+    app.kubernetes.io/component: backup
+spec:
+  schedule: {{ .Values.postgresql.backup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: postgres-backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: PGHOST
+                  value: maria-postgres
+                - name: PGPORT
+                  value: "5432"
+                - name: PGUSER
+                  value: {{ .Values.postgresql.auth.username | quote }}
+                - name: PGDATABASE
+                  value: {{ .Values.postgresql.auth.database | quote }}
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.postgresql.auth.existingSecret }}
+                      key: {{ .Values.postgresql.auth.existingSecretPasswordKey }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  BACKUP_DIR="/backups"
+                  TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+                  BACKUP_FILE="${BACKUP_DIR}/backup_${TIMESTAMP}.sql.gz"
+
+                  echo "Starting backup at $(date)"
+                  echo "Target: ${PGHOST}:${PGPORT}/${PGDATABASE}"
+
+                  # Create backup
+                  pg_dump -Fc | gzip > "${BACKUP_FILE}"
+
+                  echo "Backup created: ${BACKUP_FILE}"
+                  ls -lh "${BACKUP_FILE}"
+
+                  # Cleanup old backups (keep last N)
+                  KEEP={{ .Values.postgresql.backup.retention }}
+                  cd "${BACKUP_DIR}"
+                  ls -t backup_*.sql.gz 2>/dev/null | tail -n +$((KEEP + 1)) | xargs -r rm -f
+
+                  echo "Current backups:"
+                  ls -lht "${BACKUP_DIR}"/backup_*.sql.gz 2>/dev/null || echo "No backups found"
+
+                  echo "Backup completed at $(date)"
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+          volumes:
+            - name: backup-storage
+              {{- if .Values.postgresql.backup.persistentVolume.enabled }}
+              persistentVolumeClaim:
+                claimName: postgres-backup-pvc
+              {{- else }}
+              emptyDir:
+                sizeLimit: 1Gi
+              {{- end }}
+{{- end }}
