@@ -61,13 +61,9 @@ data:
   # Templates (What to send)
   # ---------------------------------------------------------------------------
   template.discord: |
-    body:
-      content: |
-        ✅ **ArgoCD Notification**
-
-        Application: **{{ "{{" }}.app.metadata.name{{ "}}" }}**
-        Sync Status: {{ "{{" }}.app.status.operationState.phase{{ "}}" }}
-        Health Status: {{ "{{" }}.app.status.health.status{{ "}}" }}
-
-        [Open ArgoCD]({{ "{{" }}.context.argocdUrl{{ "}}" }}/applications/{{ "{{" }}.app.metadata.name{{ "}}" }})
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {"content": "✅ **ArgoCD Notification**\n\nApplication: **{{ "{{" }}.app.metadata.name{{ "}}" }}**\nSync: {{ "{{" }}.app.status.operationState.phase{{ "}}" }}\nHealth: {{ "{{" }}.app.status.health.status{{ "}}" }}"}
 {{- end }}
