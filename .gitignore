@@ -13,8 +13,13 @@ charts/
 Thumbs.db
 
 # Secrets (NEVER commit real secrets!)
+# Plain secrets are blocked
+*-secret.yaml
 *-secrets.yaml
 !*-secrets.yaml.example
+# SealedSecrets are encrypted and SAFE to commit
+!sealed-secrets.yaml
+!**/templates/secrets/*.yaml
 *.key
 *.pem
 

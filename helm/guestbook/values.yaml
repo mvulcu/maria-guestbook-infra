@@ -34,6 +34,29 @@ monitoring:
     namespace: monitoring  # Where Grafana is deployed
 
 # -----------------------------------------------------------------------------
+# Sealed Secrets (GitOps-managed secrets)
+# -----------------------------------------------------------------------------
+# These encrypted values can only be decrypted by the sealed-secrets controller
+# in the target cluster. To rotate secrets:
+#   1. kubectl create secret ... | kubeseal --format yaml > sealed.yaml
+#   2. Copy the encryptedData value here
+# -----------------------------------------------------------------------------
+sealedSecrets:
+  enabled: true
+
+  postgres:
+    # Encrypted with cluster's sealed-secrets public key
+    encryptedPassword: AgCpj0qORnGpmDlR6GdAS8UMaL7th/Ua4jzvEgy12QAhlAUx4nUOoHfwv16c/bKPXK8siYtOfsrfPFiFQWY63F/45U48wk0/i1xQGf7ELbD8xK2L6iUwaQz/Rw/6VUp4GJk3O6Bl5qq6NirdQjzCu/d+XYDG9fvXdvLdh7oS8evUpDU/Js0g8EsmLeo4v/ebGOAEnQJ/VxAVnOf4h+shNCUHoaMWrE9/WV+IUnw92ML0Kuk82bIEndrmxASLYoPB9FaCy7bMMHfP7tL5pG7b/UqnUhmxk7219E64NGWgj6iWJ35XELGw4+NjDLvkW0IIAT6jpKHTAqbE7Sq+kJlEPSD2eLIeBrypXTBeSlEIjmVyxa0FE0uhx9OnJENKP4PKIaV/qPR9T6QxunuDwe2SD6JRNZ6LvufoxUQXderop89ph97EPGfXcD+NQUS6OHtrDHDivfjd9avBcWc2BZAkTYPwM108IFXtjm2rgyo54k3B8kJ5HRL1KXzXOBaFMPfOlD7G94XspXIRMypPXUJ3k3sKE6i9xz3lLXrtI42kSqmJw3FfYWFnot6S03Cof2tIxrsQ4o+2ZzzPozik5NqP01W9Y2u4USTTddc5EuNwVYCP+mnJz8jpdfCq0Rbj3CJJJmVmhoq3m0WKJ9YSAJtVkxhvpDvrt1eijjO9iUAw2zCHzy+j08CPMAam1kehq7jR/zxQvwOy7QmTNPUBjpXUuU8eXTLaF1BD+iIMPgkBZTTv
+
+  redis:
+    # Encrypted with cluster's sealed-secrets public key
+    encryptedPassword: AgAYlOjlnpWk7TWJTvdQjhOXu4ArA5iyWQ1AjTpZD4xDho6BkDKjX4gyZlOVjarj2fZL6UqebHw9llLDDxZrHAFWrTQrT7h27PcC/1HCdUsWTUb+BNhDznKtAVzsysS6oMJUMMJLsobfz+R27wMEzXZL1pV2rvy2yvlxaIyz+KzLssZRyezgguS+kMeoOgc5gu/6oQTLM9QrO91cEFw/QXgnnrc93T4GTFKIXfsSwWhv2pZPR1PV0SohaTzcTjQe8/HfwZQOb/m7NeBeBDRxJ6c8L5YLmt0DjjukN8UkBmO6pqsRCRnImUTxYlXug6HQIpFYHERt/20HvzdSwIbuN4MLNTLfaihJVvWRTzFkX7+EMn4uwG3zi/JFuK5RTMUGdxuo2+eAeC6OJpJV+hTdWaeUec8etRYAAtkmNos3oPM6oAZTCH/CyohAZeZw28ha1xo2azvt0KwUJoonbV2ixyX5aL3CgPEVVLqqfWbrE8hkof0x+WNWpATUuAMmPkFXMuFtGjk1ScRbNU05EaY37vv7jtRC18Umtpv+VFuDwCpI48aqrTMPJ56og6QsNeTL0HU9NVwRxGkB1X7gtemsMB9HEogh8Yc/i6oJ7RIRsRPj8DEx1yc1/QBULdxjAOnHawadvATz77OzgazltR7fJ/PXuG5Heq6dUSNEVDwSaUUh9gLm/MIV2AQ83I118YL2uxelXPUxsgFCeBCaPra1QQm9cTdOG1lugWvVvrarYKzP
+
+  ghcr:
+    # Encrypted Docker config for GHCR registry
+    encryptedDockerConfig: AgCO/ZXMaMGO/6BWbSDZdRU3SwcFeCpS92WHEr/dtUzSgCHNOFzBta+jf+XN8RWciQ9Sb2pH21Lg7+7lW5Xn1O2xG4AnYtmnPbJIAbO9uoPI4R0R9XEBnPTGGNjxrbnCp3q48VKWGaV5fgkTuu8gbPcX/231WTEbZClmMzlFB8vR6SyUmKDSvZdpC9emIppP3jr8QUxFQUNv3YLX1Jp0+xAUVi0RVjOwMgaIA2wps98zdxQA7fQa/9ERZ0ORm9pTE6ycqaZNkT+w/3jNJ+64cD6CM5ONhbGGeDUyYB6rVbtirxfjiSS4HPjyqAHutnYKNVGsLLnHhwzbXg2xTp+jODm1JUor4Q0XkV8GKkEgAx3RCKVwcKJ/EWljIgJLfR6pMtL9tsUAgitPCFVmm2KeOz8WBsgQ2pbh4/1BmoLtSy8dz2INo0HmHqr3SzVni6QGCN5t1crVwk3NGLHClT4THcCs4JBARQkuZJ9rBJgglYqFx2PcQWfAnnAuagthrsDrx3EpJbV9uoD1xj1qXrM5ap/416rBNMkn4OWa+kRpq0qCNxwFeKPI+VJuvtZiVyleHzNr6hKgWTi/FbHmkltdCe3QKh9ipvRoiViqZrOxfykTwiuLiLewXBu5u57cOJZ4ZYS5Uf5iH/3MhKPfGZGjNnZHMonssVnQfJd77p7EXrcwIrEe2Q4z/l408KfrgAI4i3DKOdLV3t/nKYwydUJ9ZiBqoPELYNp0wyMopOd4kziArQU0LNpw6g8i9OdTr8MeWqI8elMckPUa/uSjIuVf4ALGiQLLHcWEDrQfGhWf2JydEZsuwqGtzVh75xpRX3IjQwbGEr0GAPZBwQi0Co0JMig/iwTLPFJrspV3NB/EEvOtp7OO7114/Bp02JEIRgzD8bxARXHnnKh9ZtqXNx8qeVU4mECN2YRKIV1vyTkL/gY0F/8=
+
+# -----------------------------------------------------------------------------
 # Backend (Go API Server)
 # -----------------------------------------------------------------------------
 backend:

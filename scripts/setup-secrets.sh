@@ -2,8 +2,19 @@
 # =============================================================================
 # Setup Secrets - Infrastructure as Code
 # =============================================================================
-# This script creates required secrets that are not stored in Git
-# Run this once after bootstrap
+# ⚠️  DEPRECATED: This script is kept for reference only!
+#
+# Secrets are now managed via SealedSecrets in Git:
+#   - helm/guestbook/templates/secrets/sealed-secrets.yaml
+#   - helm/guestbook/values.yaml (sealedSecrets section)
+#
+# To rotate secrets:
+#   1. Create new secret: kubectl create secret generic ...
+#   2. Seal it: kubeseal --format yaml < secret.yaml > sealed.yaml
+#   3. Update values.yaml with new encryptedData
+#   4. Commit and push - ArgoCD will apply automatically
+#
+# This script is kept for emergency manual secret creation only.
 # =============================================================================
 
 set -e

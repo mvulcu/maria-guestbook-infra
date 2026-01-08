@@ -55,6 +55,8 @@ spec:
       kind: '*'
     - group: monitoring.coreos.com
       kind: '*'
+    - group: bitnami.com
+      kind: '*'
 
   # Roles for this project
   roles:
