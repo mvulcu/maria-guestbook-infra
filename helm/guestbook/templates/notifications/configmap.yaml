@@ -15,11 +15,14 @@ metadata:
     app.kubernetes.io/managed-by: helm
 data:
   # ---------------------------------------------------------------------------
-  # Service Configuration
+  # Service Configuration (Generic Webhook for Discord)
   # ---------------------------------------------------------------------------
-  service.discord: |
+  service.webhook.discord: |
     url: $discord-webhook-url
-    iconurl: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
+    headers:
+    - name: Content-Type
+      value: application/json
+    default-method: POST
 
   # ---------------------------------------------------------------------------
   # Triggers (When to send notifications)
@@ -46,20 +49,13 @@ data:
   # Templates (What to send)
   # ---------------------------------------------------------------------------
   template.discord: |
-    message: |
-      {{ "{{" }}if eq .app.status.operationState.phase "Succeeded"{{ "}}" }}✅{{ "{{" }}else if eq .app.status.operationState.phase "Failed" "Error"{{ "}}" }}❌{{ "{{" }}else{{ "}}" }}⚠️{{ "{{" }}end{{ "}}" }} Application **{{ "{{" }}.app.metadata.name{{ "}}" }}** is now **{{ "{{" }}.app.status.health.status{{ "}}" }}**.
+    body:
+      content: |
+        ✅ **ArgoCD Notification**
 
-      Status: {{ "{{" }}.app.status.operationState.phase{{ "}}" }}
-      Sync Status: {{ "{{" }}.app.status.sync.status{{ "}}" }}
+        Application: **{{ "{{" }}.app.metadata.name{{ "}}" }}**
+        Sync Status: {{ "{{" }}.app.status.operationState.phase{{ "}}" }}
+        Health Status: {{ "{{" }}.app.status.health.status{{ "}}" }}
 
-      [Open ArgoCD]({{ "{{" }}.context.argocdUrl{{ "}}" }}/applications/{{ "{{" }}.app.metadata.name{{ "}}" }})
-
-    discord:
-      title: "ArgoCD Notification: {{ "{{" }}.app.metadata.name{{ "}}" }}"
-      description: |
-        Application {{ "{{" }}.app.metadata.name{{ "}}" }} has changed state.
-
-        **Health:** {{ "{{" }}.app.status.health.status{{ "}}" }}
-        **Sync:** {{ "{{" }}.app.status.sync.status{{ "}}" }}
-        **Message:** {{ "{{" }}.app.status.operationState.message{{ "}}" }}
+        [Open ArgoCD]({{ "{{" }}.context.argocdUrl{{ "}}" }}/applications/{{ "{{" }}.app.metadata.name{{ "}}" }})
 {{- end }}
