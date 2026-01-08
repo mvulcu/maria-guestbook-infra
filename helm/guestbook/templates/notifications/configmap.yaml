@@ -1,0 +1,65 @@
+# =============================================================================
+# ArgoCD Notifications - ConfigMap
+# =============================================================================
+# Configures triggers and templates for notifications.
+# Deployed to 'argocd' namespace to configure the controller.
+# =============================================================================
+{{- if .Values.notifications.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/managed-by: helm
+data:
+  # ---------------------------------------------------------------------------
+  # Service Configuration
+  # ---------------------------------------------------------------------------
+  service.discord: |
+    url: $discord-webhook-url
+    iconurl: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
+
+  # ---------------------------------------------------------------------------
+  # Triggers (When to send notifications)
+  # ---------------------------------------------------------------------------
+  # Sync Succeeded
+  trigger.on-sync-succeeded: |
+    - description: Application sync succeeded
+      send: [discord]
+      when: app.status.operationState.phase in ['Succeeded']
+
+  # Sync Failed
+  trigger.on-sync-failed: |
+    - description: Application sync failed
+      send: [discord]
+      when: app.status.operationState.phase in ['Error', 'Failed']
+
+  # Application Degraded
+  trigger.on-health-degraded: |
+    - description: Application health degraded
+      send: [discord]
+      when: app.status.health.status == 'Degraded'
+
+  # ---------------------------------------------------------------------------
+  # Templates (What to send)
+  # ---------------------------------------------------------------------------
+  template.discord: |
+    message: |
+      {{ "{{" }}if eq .app.status.operationState.phase "Succeeded"{{ "}}" }}✅{{ "{{" }}else if eq .app.status.operationState.phase "Failed" "Error"{{ "}}" }}❌{{ "{{" }}else{{ "}}" }}⚠️{{ "{{" }}end{{ "}}" }} Application **{{ "{{" }}.app.metadata.name{{ "}}" }}** is now **{{ "{{" }}.app.status.health.status{{ "}}" }}**.
+
+      Status: {{ "{{" }}.app.status.operationState.phase{{ "}}" }}
+      Sync Status: {{ "{{" }}.app.status.sync.status{{ "}}" }}
+
+      [Open ArgoCD]({{ "{{" }}.context.argocdUrl{{ "}}" }}/applications/{{ "{{" }}.app.metadata.name{{ "}}" }})
+
+    discord:
+      title: "ArgoCD Notification: {{ "{{" }}.app.metadata.name{{ "}}" }}"
+      description: |
+        Application {{ "{{" }}.app.metadata.name{{ "}}" }} has changed state.
+
+        **Health:** {{ "{{" }}.app.status.health.status{{ "}}" }}
+        **Sync:** {{ "{{" }}.app.status.sync.status{{ "}}" }}
+        **Message:** {{ "{{" }}.app.status.operationState.message{{ "}}" }}
+{{- end }}

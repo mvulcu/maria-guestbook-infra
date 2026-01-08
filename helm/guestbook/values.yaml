@@ -57,6 +57,15 @@ sealedSecrets:
     encryptedDockerConfig: AgCO/ZXMaMGO/6BWbSDZdRU3SwcFeCpS92WHEr/dtUzSgCHNOFzBta+jf+XN8RWciQ9Sb2pH21Lg7+7lW5Xn1O2xG4AnYtmnPbJIAbO9uoPI4R0R9XEBnPTGGNjxrbnCp3q48VKWGaV5fgkTuu8gbPcX/231WTEbZClmMzlFB8vR6SyUmKDSvZdpC9emIppP3jr8QUxFQUNv3YLX1Jp0+xAUVi0RVjOwMgaIA2wps98zdxQA7fQa/9ERZ0ORm9pTE6ycqaZNkT+w/3jNJ+64cD6CM5ONhbGGeDUyYB6rVbtirxfjiSS4HPjyqAHutnYKNVGsLLnHhwzbXg2xTp+jODm1JUor4Q0XkV8GKkEgAx3RCKVwcKJ/EWljIgJLfR6pMtL9tsUAgitPCFVmm2KeOz8WBsgQ2pbh4/1BmoLtSy8dz2INo0HmHqr3SzVni6QGCN5t1crVwk3NGLHClT4THcCs4JBARQkuZJ9rBJgglYqFx2PcQWfAnnAuagthrsDrx3EpJbV9uoD1xj1qXrM5ap/416rBNMkn4OWa+kRpq0qCNxwFeKPI+VJuvtZiVyleHzNr6hKgWTi/FbHmkltdCe3QKh9ipvRoiViqZrOxfykTwiuLiLewXBu5u57cOJZ4ZYS5Uf5iH/3MhKPfGZGjNnZHMonssVnQfJd77p7EXrcwIrEe2Q4z/l408KfrgAI4i3DKOdLV3t/nKYwydUJ9ZiBqoPELYNp0wyMopOd4kziArQU0LNpw6g8i9OdTr8MeWqI8elMckPUa/uSjIuVf4ALGiQLLHcWEDrQfGhWf2JydEZsuwqGtzVh75xpRX3IjQwbGEr0GAPZBwQi0Co0JMig/iwTLPFJrspV3NB/EEvOtp7OO7114/Bp02JEIRgzD8bxARXHnnKh9ZtqXNx8qeVU4mECN2YRKIV1vyTkL/gY0F/8=
 
 # -----------------------------------------------------------------------------
+# ArgoCD Notifications
+# -----------------------------------------------------------------------------
+notifications:
+  enabled: true
+  discord:
+    # Encrypted with sealed-secrets
+    encryptedWebhookUrl: AgAtNtaSySBJ5/jgE60ShbR2fHkEzg2MTEF1YXI0rAG1FoPU2bUDKFjtcJOxx19vdwhrVDV7VP0al2+sVuh3FyJo+uMyWfzL1iE9TywvkWO5muFJiU5OzxedhRjH4fAUKMvzE8PY7WwqEqHL9P+KpTu+DPGXKlxEDkj8bJas/k6P8ID4ANLPUTtw5m2g7oCRJNLmisfhNw4/AqObDQJpF/Bt5FCB13fe7+tKYVdWMRbXgPLjNObfjCj8+9j+4tMMqAz7gITQi3vPz018xM3t+HZv49ONtcAhELvhteG0vYuHhA8wpJuOg8tEs4AGEuD9gLCgWXGnfw/NiseGTpWz+QtALHScNwvyJyNRaIq662xlCzdCPs+/TbKVVB1epn5fEjHeeXl2SzoozjoAIxJtnCsBfr81Y0ewgxf/tnDi2TXMxzm0lFaMlvV5WrVy9C2Uap5MMlonpxvkvEzmwTWt49sSSDS2XFvllKbUjQ8tzmdIQplGUeEgZINOMBevL4F10DQ0T9F8lDOg41DWcqoomk6z8w9UkCgy4Gj4s3uEkMla7qo/nrhCPrUnTJCMaaAdG+XmvPJe6n78xV27mGLoRdfFGTLWktYtu1w95DjJOuH1sqbiOIvQquMM0zJ+2CT7qRCOLqd+DFgoGTXM9rpeT8eM/vikGlhZWcu3oLEZSn+bDCWP0/5O3YRBThce0s7/nwnr0ZTRPR/HINDMOU9N2ZHFQig+VxzkTXby2zQ8BmSGSRYH2UA/68vjyOZKl1RJIHdCQQDGM7zlYCLSo1TE/Y9jDvXEF/8JtVSLyeoNx9oPLgfOaW37Uj0DANxYgR8B+C2H/mPnLUcmGjtXJYgDUVN8pYPUi0AI4H6H
+
+# -----------------------------------------------------------------------------
 # Backend (Go API Server)
 # -----------------------------------------------------------------------------
 backend:
