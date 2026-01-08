@@ -248,7 +248,7 @@ data:
           "targets": [
             {
               "expr": "sum(rate(guestbook_requests_total{namespace=\"maria-guestbook\"}[1m])) by (method)",
-              "legendFormat": "{{method}}",
+              "legendFormat": "{{ "{{" }}method{{ "}}" }}",
               "refId": "A"
             }
           ],
@@ -405,7 +405,7 @@ data:
           "targets": [
             {
               "expr": "sum(rate(guestbook_requests_total{namespace=\"maria-guestbook\"}[1m])) by (endpoint)",
-              "legendFormat": "{{endpoint}}",
+              "legendFormat": "{{ "{{" }}endpoint{{ "}}" }}",
               "refId": "A"
             }
           ],
