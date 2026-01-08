@@ -25,10 +25,10 @@ metadata:
     # ==========================================================================
     # ArgoCD Image Updater Configuration
     # ==========================================================================
-    # Images to track (alias=image:tag-strategy)
-    argocd-image-updater.argoproj.io/image-list: |
-      backend=ghcr.io/mvulcu/maria-guestbook-backend:~main
-      frontend=ghcr.io/mvulcu/maria-guestbook-frontend:~main
+    # Images to track (use 'latest' strategy for SHA-tagged images)
+    argocd-image-updater.argoproj.io/image-list: backend=ghcr.io/mvulcu/maria-guestbook-backend,frontend=ghcr.io/mvulcu/maria-guestbook-frontend
+    argocd-image-updater.argoproj.io/backend.update-strategy: latest
+    argocd-image-updater.argoproj.io/frontend.update-strategy: latest
 
     # Update strategy: Use Git write-back (commit to repo)
     argocd-image-updater.argoproj.io/write-back-method: git
