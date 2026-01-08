@@ -21,6 +21,19 @@ networkPolicy:
   enabled: true
 
 # -----------------------------------------------------------------------------
+# Monitoring (Prometheus)
+# -----------------------------------------------------------------------------
+monitoring:
+  enabled: true
+  # ServiceMonitor settings
+  interval: 30s
+  scrapeTimeout: 10s
+  # Grafana Dashboard
+  dashboard:
+    enabled: true
+    namespace: monitoring  # Where Grafana is deployed
+
+# -----------------------------------------------------------------------------
 # Backend (Go API Server)
 # -----------------------------------------------------------------------------
 backend:
