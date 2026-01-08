@@ -29,6 +29,8 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: argocd
       server: https://kubernetes.default.svc
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
 
   # Cluster resources that can be managed
   clusterResourceWhitelist:
@@ -50,6 +52,8 @@ spec:
     - group: policy
       kind: '*'
     - group: argoproj.io
+      kind: '*'
+    - group: monitoring.coreos.com
       kind: '*'
 
   # Roles for this project
