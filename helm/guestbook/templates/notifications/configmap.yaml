@@ -39,11 +39,23 @@ data:
       send: [discord]
       when: app.status.operationState.phase in ['Error', 'Failed']
 
+  # Sync Running
+  trigger.on-sync-running: |
+    - description: Application sync running
+      send: [discord]
+      when: app.status.operationState.phase in ['Running']
+
   # Application Degraded
   trigger.on-health-degraded: |
     - description: Application health degraded
       send: [discord]
       when: app.status.health.status == 'Degraded'
+
+  # Application Deployed (Health Restored)
+  trigger.on-deployed: |
+    - description: Application deployed successfully
+      send: [discord]
+      when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
 
   # ---------------------------------------------------------------------------
   # Templates (What to send)
