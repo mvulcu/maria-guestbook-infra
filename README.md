@@ -46,6 +46,10 @@ This project implements a GitOps-based CI/CD pipeline where:
 | Database | PostgreSQL 15 | Persistent storage |
 | Cache | Redis 7 | Caching layer |
 | Progressive Delivery | Argo Rollouts | Canary deployments |
+| Metrics | Prometheus | Metric collection |
+| Dashboards | Grafana | Visualization & alerting |
+| Logging | Loki + Promtail | Centralized logs |
+| Secrets | Sealed Secrets | GitOps-encrypted secrets |
 
 ### Architecture Diagram
 
@@ -126,10 +130,11 @@ The pause step allows manual validation before promotion and can be skipped or p
 | Feature | Implementation |
 |---------|----------------|
 | Network Policies | Zero-trust (default-deny + explicit allow) |
-| Secret Management | Manual creation via `setup-secrets.sh` |
+| Secret Management | Sealed Secrets (GitOps-managed, encrypted in Git) |
 | Container Scanning | Trivy (fail on CRITICAL/HIGH) |
 | RBAC | Dedicated ServiceAccount with minimal permissions |
 | Resource Quotas | Namespace-level CPU/memory limits |
+| Security Context | runAsNonRoot, drop ALL capabilities |
 
 ### Network Policy Example
 
@@ -138,6 +143,87 @@ Frontend ← Ingress Controller (allowed)
 Backend ← Frontend only (allowed)
 Redis ← Backend only (allowed)
 PostgreSQL ← Backend only (allowed)
+```
+
+---
+
+## 📡 Monitoring & Observability
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| Metrics | Prometheus | Metric collection & storage |
+| Visualization | Grafana | Dashboards & charts |
+| Logging | Loki + Promtail | Centralized log aggregation |
+| Alerting | Grafana → Discord | Incident notifications |
+
+### ServiceMonitor
+
+Backend metrics are automatically scraped by Prometheus via `ServiceMonitor` CRD:
+```yaml
+# helm/guestbook/templates/app/servicemonitor.yaml
+endpoints:
+  - port: http
+    interval: 30s
+```
+
+### Grafana Dashboards
+
+| Dashboard | Contents |
+|-----------|----------|
+| Maria Guestbook | Request rate, latency, error rate |
+| SRE Overview | SLO metrics, pod health, CPU/Memory, live logs |
+
+Dashboards are deployed automatically via Grafana sidecar (ConfigMap with `grafana_dashboard` label).
+
+### Alerting
+
+Grafana alerts configured → Discord webhook:
+- 🔴 **Pod Down** — Less than expected replicas
+- 🟠 **High Memory** — Usage > 80%
+- ⚠️ **Pod Restarts** — Restart count increased
+
+---
+
+## 🔔 ArgoCD Notifications
+
+Discord notifications for deployment events:
+
+| Event | Emoji |
+|-------|-------|
+| Sync Running | 🔄 |
+| Sync Succeeded | ✅ |
+| Sync Failed | ❌ |
+| Health Degraded | ⚠️ |
+| Deployed (Healthy) | 💚 |
+
+---
+
+## 🔄 ArgoCD Image Updater
+
+Automatic image tag updates without manual intervention:
+
+```yaml
+# Annotations on Application
+argocd-image-updater.argoproj.io/image-list: backend=ghcr.io/mvulcu/maria-guestbook-backend
+argocd-image-updater.argoproj.io/backend.update-strategy: latest
+argocd-image-updater.argoproj.io/write-back-method: git
+```
+
+**Flow:** New image pushed → Image Updater detects → Commits new tag to infra repo → ArgoCD syncs
+
+---
+
+## 💾 PostgreSQL Backup
+
+| Setting | Value |
+|---------|-------|
+| Schedule | Daily at 2:00 AM (CronJob) |
+| Retention | 7 backups |
+| Method | `pg_dump` |
+
+```bash
+# Manual backup trigger
+kubectl create job --from=cronjob/postgres-backup manual-backup -n maria-guestbook
 ```
 
 ---
@@ -204,15 +290,28 @@ maria-guestbook-app/
 maria-guestbook-infra/
 ├── argocd/
 │   ├── app-of-apps.yaml  # Root application
-│   ├── guestbook.yaml    # Main app
-│   └── argo-rollouts.yaml
+│   ├── guestbook.yaml    # Main app + Image Updater annotations
+│   ├── argo-rollouts.yaml
+│   └── image-updater.yaml
 ├── helm/guestbook/
 │   ├── Chart.yaml
 │   ├── values.yaml       # Configuration
 │   └── templates/
-├── bootstrap/            # Initial setup
+│       ├── app/
+│       │   ├── backend-deployment.yaml
+│       │   ├── frontend-deployment.yaml
+│       │   ├── servicemonitor.yaml       # Prometheus scraping
+│       │   └── grafana-dashboard.yaml    # Dashboard ConfigMap
+│       ├── secrets/
+│       │   └── sealed-secrets.yaml       # Encrypted secrets
+│       ├── postgres/
+│       │   ├── deployment.yaml
+│       │   └── backup-cronjob.yaml       # Daily backups
+│       └── notifications/
+│           └── argocd-notifications-cm.yaml
+├── bootstrap/            # Initial cluster setup
 └── scripts/
-    └── setup-secrets.sh
+    └── setup-secrets.sh  # (deprecated, use Sealed Secrets)
 ```
 
 ---
