@@ -118,7 +118,7 @@ backend:
 # -----------------------------------------------------------------------------
 frontend:
   # Number of replicas - CHANGE THIS TO TEST SCALING
-  replicaCount: 2
+  replicaCount: 6
 
   image:
     repository: ghcr.io/mvulcu/maria-guestbook-frontend
@@ -275,3 +275,4 @@ containerSecurityContext:
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
