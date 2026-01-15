@@ -79,17 +79,20 @@ spec:
         maxDuration: 3m
 
   # Ignore runtime differences (HPA, manual scaling, etc.)
+  # NOTE: Removed ignoreDifferences for Rollout replicas to allow GitOps scaling
+  # If you enable HPA (autoscaling.enabled: true), add back the Rollout ignore rule
   ignoreDifferences:
     # Ignore replicas for Deployments (HPA managed)
     - group: apps
       kind: Deployment
       jsonPointers:
         - /spec/replicas
-    # Ignore replicas for Rollouts (Argo Rollouts)
-    - group: argoproj.io
-      kind: Rollout
-      jsonPointers:
-        - /spec/replicas
+    # Rollout replicas are now managed by GitOps (values.yaml)
+    # Uncomment below if using HPA with Rollouts:
+    # - group: argoproj.io
+    #   kind: Rollout
+    #   jsonPointers:
+    #     - /spec/replicas
     - group: autoscaling
       kind: HorizontalPodAutoscaler
       jsonPointers:
