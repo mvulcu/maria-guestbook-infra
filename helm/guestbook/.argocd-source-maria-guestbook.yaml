@@ -12,6 +12,3 @@ helm:
   - name: frontend.image.tag
     value: a5f2dbf
     forcestring: true
-  - name: backend.replicaCount
-    value: "1"
-    forcestring: false
