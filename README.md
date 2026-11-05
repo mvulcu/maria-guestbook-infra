@@ -1,7 +1,4 @@
 <p align="center">
-  <a href="https://maria-guestbook.cicd.cachefly.site">
-    <img src="https://img.shields.io/badge/🌐 Live Demo-maria--guestbook-1abc9c?style=for-the-badge" alt="Live Demo">
-  </a>
   <a href="https://github.com/mvulcu/maria-guestbook-app">
     <img src="https://img.shields.io/badge/📦 App Repo-GitHub-181717?style=for-the-badge&logo=github" alt="App Repo">
   </a>
@@ -12,19 +9,17 @@
 
 ---
 
-# Maria Guestbook — GitOps Production Showcase
+# Maria Guestbook — GitOps Delivery Platform
 
-**Student:** Maria Vulcu  
-**Course:** CI/CD  
-**Date:** January 2026
+**Author:** Maria Vulcu · **Built:** January 2026 · **Context:** started as the final project of a CI/CD course and extended well beyond the brief
 
 ---
 
 ## 🎯 Project Evolution
 
-**From Assignment to Production Showcase**
+**From assignment to a full GitOps platform**
 
-This started as a CI/CD course final project with basic requirements, but I chose to go beyond — transforming it into a comprehensive GitOps demonstration that mirrors enterprise practices.
+This started as a CI/CD course final project with basic requirements, but I chose to go beyond — turning it into a GitOps platform that applies the practices production teams use: progressive delivery, observability, secret management and policy-based network isolation.
 
 ### ✅ What Was Required
 
@@ -40,12 +35,12 @@ The assignment asked for:
 Going beyond the assignment, I implemented:
 - **Advanced Deployments**: Canary rollouts with Argo Rollouts and automatic rollback
 - **Complete Observability**: Prometheus + Grafana + Loki stack for metrics and logs
-- **Production Security**: Zero-trust NetworkPolicies, Sealed Secrets, Trivy scanning
+- **Security**: default-deny NetworkPolicies, Sealed Secrets, Trivy scanning
 - **Operational Excellence**: Automated backups, Discord alerting, ArgoCD Image Updater
 - **Two-repo GitOps pattern**: Clean separation of app and infrastructure concerns
 - **CI/CD Pipeline**: GitHub Actions with security scanning that fails on CRITICAL/HIGH vulnerabilities
 
-**Why?** Because I believe in building systems that are production-ready, not just assignment-complete.
+**Why?** I wanted to practise how production systems are built and operated, not just complete the assignment.
 
 > *"I don't look for easy paths."*
 
@@ -53,7 +48,7 @@ Going beyond the assignment, I implemented:
 
 ## 🌐 Live Application
 
-**URL:** https://maria-guestbook.cicd.cachefly.site
+The demo cluster has been decommissioned. Everything needed to recreate it is in this repository and in [maria-guestbook-app](https://github.com/mvulcu/maria-guestbook-app).
 
 ---
 
@@ -70,7 +65,7 @@ This separation enables:
 - Independent versioning and release cycles
 - Clear ownership boundaries
 - Reduced blast radius of changes
-- Real-world enterprise GitOps practices
+- GitOps practices used by real platform teams
 
 ### Technology Stack
 
@@ -217,7 +212,7 @@ The pause step allows manual validation before promotion and can be skipped or p
 | Layer | Implementation | Purpose |
 |-------|----------------|---------|
 | **Build** | Trivy scanning | Block vulnerable images |
-| **Network** | NetworkPolicies | Zero-trust pod isolation |
+| **Network** | NetworkPolicies | Default-deny pod isolation |
 | **Secrets** | Sealed Secrets | GitOps-safe secret management |
 | **Access** | RBAC | Least-privilege service accounts |
 | **Runtime** | Security Context | Non-root, dropped capabilities |
@@ -225,7 +220,7 @@ The pause step allows manual validation before promotion and can be skipped or p
 
 ### Network Policy Example
 
-Zero-trust architecture with explicit allow rules:
+Default-deny policy with explicit allow rules:
 
 ```
 Frontend ← Ingress Controller (allowed)
@@ -415,7 +410,7 @@ go test -v ./...
 
 ### Manual Verification
 
-1. Open https://maria-guestbook.cicd.cachefly.site
+1. Open the application URL of your deployment
 2. Submit a message → should appear immediately in the list
 3. Open incognito window → message should persist (database verification)
 4. Refresh page → message still visible (cache + database verification)
@@ -479,7 +474,7 @@ maria-guestbook-infra/
 │       ├── redis/
 │       │   └── deployment.yaml
 │       ├── network/
-│       │   └── network-policies.yaml     # Zero-trust rules
+│       │   └── network-policies.yaml     # Default-deny + allow rules
 │       └── notifications/
 │           └── argocd-notifications-cm.yaml  # Discord alerts
 ├── monitoring/
@@ -560,7 +555,7 @@ Working on this project taught me that **meeting requirements is just the baseli
 
 ### Technical Insights
 
-- **Security by Design**: Implementing zero-trust from day one, not as an afterthought. NetworkPolicies, Sealed Secrets, and vulnerability scanning aren't optional — they're foundational.
+- **Security by Design**: Default-deny networking from day one, not as an afterthought. NetworkPolicies, Sealed Secrets, and vulnerability scanning aren't optional — they're foundational.
 
 - **Observability First**: You can't fix what you can't see. Metrics, logs, and alerts need to be built into the architecture, not bolted on later.
 
